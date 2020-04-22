@@ -24,10 +24,12 @@ The script will prompt you to confirm or enter the target drive letter; once a d
 Alternatively you can specify arguments as desired:
 
 ```
-PS C:\ClamWinScripts\ > Create-ClamDisk -DriveLetter E -DatabaseDir C:\CustomDBPath\.clamwin\db\ -ConfigFilePath .\
+PS C:\ClamWinScripts\ > Create-ClamDisk -DriveLetter E -DatabaseDir C:\CustomDBPath\.clamwin\db\ -ConfigPath .\ -Force
 ```
 
-You will still be prompted before drives are written to.
+You will still be prompted before drives are written to, unless you provide the -Force switch, which will progress all actions - format, update etc. - against whatever drive is automaticlly detected if you don't specify the target.
+
+Be very careful with the Force switch. Always specify the right target drive if you use it.
 
 ## Update
 

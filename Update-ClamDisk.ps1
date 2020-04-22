@@ -11,7 +11,7 @@
 #####################################################################
 
 param (
-    [string]$TargetDrive = $(
+    [string]$DriveLetter = $(
                               IF(gwmi win32_volume -f 'label=''CLAMWIN''')
                               {
                                 gwmi win32_volume -f 'label=''CLAMWIN''' | select -expandproperty Caption
@@ -21,7 +21,7 @@ param (
                                   Read-Host "Drive not detected. Enter drive letter"
                               }
                             ),
-    [string]$ConfigFilePath = "C:\Program Files\clamwin",
+    [string]$ConfigPath = "C:\Program Files\clamwin",
     [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db",
     [swtich]$Force
 
@@ -35,18 +35,18 @@ ELSE
 {
     #Offer user input to agree or override drive selection
 
-    $msg = "Your media is at: " + $TargetDrive + " Is this correct? [y/n]"
+    $msg = "Your media is at: " + $DriveLetter + " Is this correct? [y/n]"
     do {
         $response = Read-Host -Prompt $msg
         if ($response -like 'n') {
-            $TargetDrive = Read-Host "Input target drive"
+            $DriveLetter = Read-Host "Input target drive"
         }
 
     } until ($response -like 'y')
 }
 
 #Move databases
-cp -Force -Path ($DatabaseDir + "\*") -Destination ($TargetDrive + "clamwin\db")
+cp -Force -Path ($DatabaseDir + "\*") -Destination ($DriveLetter + "clamwin\db")
 
 #Tell the user we're done!
 Write-Output "Drive complete - Why not try it?"

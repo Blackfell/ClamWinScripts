@@ -11,7 +11,7 @@
 #####################################################################
 
 #Setup parameters for target dive and Clamwin Files
-#[string]$ConfigFilePath = "${Env:ProgramFiles(x86)}\clamwin", TODO - put this in clamwin prog dir
+#[string]$ConfigPath = "${Env:ProgramFiles(x86)}\clamwin", TODO - put this in clamwin prog dir
 
 param (
     [string]$DriveLetter = $(
@@ -24,7 +24,7 @@ param (
                                 Read-Host "No drive detected, enter drive letter"
                               }
                             ),
-    [string]$ConfigFilePath = ".\",
+    [string]$ConfigPath = ".\",
     [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db",
     [switch]$Force
 )
@@ -78,7 +78,7 @@ $BinDest = $DriveLetter + "clamwin\bin"
 $BinFiles | foreach {cp -Path ($BinSource + $_) -Destination $bin_dest}
 
 #Copy the config file
-cp -Path ($ConfigFilePath + "ClamWin.conf") -Destination $BinDest
+cp -Path ($ConfigPath + "ClamWin.conf") -Destination $BinDest
 
 
 #Move databases
