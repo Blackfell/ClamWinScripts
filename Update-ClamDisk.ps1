@@ -23,7 +23,7 @@ param (
                             ),
     [string]$ConfigPath = "C:\Program Files\clamwin",
     [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db",
-    [swtich]$Force
+    [switch]$Force
 
 )
 
