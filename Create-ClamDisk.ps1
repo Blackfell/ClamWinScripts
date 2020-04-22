@@ -12,7 +12,7 @@
 
 #Setup parameters for target dive and Clamwin Files
 param (
-    [Parameter(Mandatory=$true)][string]$TargetDrive = $( Read-Host "Input target drive LETTER only please:" ),
+    [Parameter(Mandatory=$true)][string]$TargetDrive = (Read-Host "Input target drive LETTER only please" ),
     [string]$ConfigFilePath = "C:\Program Files\clamwin",
     [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db"
 )
@@ -29,10 +29,10 @@ Else{
 $msg = "The drive path (including trailing ':\' is: " + $TargetDrive + " Is this correct? [y/n]"
 do {
     $response = Read-Host -Prompt $msg
-    if ($response -like 'y') {
-        $TargetDrive = Read-Host "Input target drive, including trailig ':\' please:"
+    if ($response -like 'n') {
+        $TargetDrive = Read-Host "Input target drive, including trailing ':\' please"
     }
-} until ($response -like 'n')
+} until ($response -like 'y')
 
 #Copy the main bulk of files to the USB
 cp -Recurse -Path c:\program files\clamwin\* -Destination $TargetDrive
