@@ -13,7 +13,7 @@
 #Setup parameters for target dive and Clamwin Files
 param (
     [Parameter(Mandatory=$true)][string]$TargetDrive = (Read-Host "Input target drive LETTER only please" ),
-    [string]$ConfigFilePath = "C:\Program Files\clamwin",
+    [string]$ConfigFilePath = "{$ProgramFiles(x86}\clamwin",
     [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db"
 )
 
@@ -35,15 +35,15 @@ do {
 } until ($response -like 'y')
 
 #Copy the main bulk of files to the USB
-cp -Recurse -Path "c:\program files\clamwin\*" -Destination $TargetDrive
+cp -Recurse -Path "{$ProgramFiles(x86}\clamwin\*" -Destination $TargetDrive
 #TODO except unins000.exe abnd unins000.dat - doesn't seem to create any issues
 
 #Copy all binary files to the bin directory
 $BinFiles = @("Microsoft.VC80.CRT.manifest", "msvcm80.dll", "msvcm80.dll", "msvcr80.dll")
-$BinSource
+$BinSource = "{$ProgramFiles(x86}\clamwin\bin\Microsoft.VC80.CRT\\"
 $BinDest = $TargetDrive + "clamwin\bin"
 $BinFiles | foreach {cp -Path (b$bin_source + $_) -Destination $bin_dest}
- 
+
 #Copy the config file - TODO - get the config file from the site
 cp -Path (ConfigFilePath + "ClamWin.conf") -Destination $bin_dest
 
@@ -70,6 +70,6 @@ Write-Output "
    \ `.`.\ |!|! |/,'.' /
     `._`.\\\!!!// .'_.'
        `.`.\\|//.'.'
-        |`._`n'_.'| 
+        |`._`n'_.'|
         '----^----'
 "
