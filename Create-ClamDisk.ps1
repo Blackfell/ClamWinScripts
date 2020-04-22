@@ -25,7 +25,8 @@ param (
                               }
                             ),
     [string]$ConfigFilePath = ".\",
-    [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db"
+    [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db",
+    [switch]$Force
 )
 
 #Format drive letter
@@ -34,24 +35,30 @@ Else{
     $DriveLetter = $DriveLetter + ":\"
     }
 
-#Now sanity check and offer user input to override
+IF($Force){
+    #User cannot interact with script - no confirmation of drive letter - Dangerous
+    echo "Forcing drive selection - Careful!"
+}
+ELSE{
+    #Sanity check and offer user input to override
 
-$msg = "Your media is at: " + $DriveLetter + " Is this correct? [y/n]"
-do {
-    $response = Read-Host -Prompt $msg
-    if ($response -like 'n') {
-        $DriveLetter = Read-Host "Input target drive letter"
-    }
-} until ($response -like 'y')
+    $msg = "Your media is at: " + $DriveLetter + " Is this correct? [y/n]"
+    do {
+        $response = Read-Host -Prompt $msg
+        if ($response -like 'n') {
+            $DriveLetter = Read-Host "Input target drive letter"
+        }
+    } until ($response -like 'y')
 
-#Now make sure user understands the consequences of proceeding
-$msg = "This will now wipe all data on disk " + $DriveLetter + " Continue? [y/n]"
-do {
-    $response = Read-Host -Prompt $msg
-    if ($response -like 'n') {
-        exit
-    }
-} until ($response -like 'y')
+    #Now make sure user understands the consequences of proceeding
+    $msg = "This will now wipe all data on disk " + $DriveLetter + " Continue? [y/n]"
+    do {
+        $response = Read-Host -Prompt $msg
+        if ($response -like 'n') {
+            exit
+        }
+    } until ($response -like 'y')
+}
 
 #Format the Drive
 Format-Volume -DriveLetter $DriveLetter[0] -Filesystem exFAT -NewFileSystemLabel "CLAMWIN" | Out-Null

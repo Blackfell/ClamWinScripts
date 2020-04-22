@@ -22,20 +22,28 @@ param (
                               }
                             ),
     [string]$ConfigFilePath = "C:\Program Files\clamwin",
-    [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db"
+    [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db",
+    [swtich]$Force
+
 )
 
+IF(Force)
+{
+  #No user input to get drive selection
+}
+ELSE
+{
+    #Offer user input to agree or override drive selection
 
-#Offer user input to agree or override drive selection
-$msg = "Your media is at: " + $TargetDrive + " Is this correct? [y/n]"
+    $msg = "Your media is at: " + $TargetDrive + " Is this correct? [y/n]"
+    do {
+        $response = Read-Host -Prompt $msg
+        if ($response -like 'n') {
+            $TargetDrive = Read-Host "Input target drive"
+        }
 
-do {
-    $response = Read-Host -Prompt $msg
-    if ($response -like 'n') {
-        $TargetDrive = Read-Host "Input target drive"
-    }
-
-} until ($response -like 'y')
+    } until ($response -like 'y')
+}
 
 #Move databases
 cp -Force -Path ($DatabaseDir + "\*") -Destination ($TargetDrive + "clamwin\db")
