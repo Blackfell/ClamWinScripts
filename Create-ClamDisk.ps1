@@ -19,7 +19,7 @@ param (
 
 #Try and get drive path correct by ourselves
 
-IF ($TargetDrive.contains(":\"){}
+IF ($TargetDrive.contains(":\")){}
 Else{
     $TargetDrive = $TargetDrive + ":\"
     }
@@ -41,7 +41,7 @@ cp -Recurse -Path c:\program files\clamwin\* -Destination $TargetDrive
 #Copy all binary files to the bin directory
 $BinFiles = @("Microsoft.VC80.CRT.manifest", "msvcm80.dll", "msvcm80.dll", "msvcr80.dll")
 $BinSource
-$BinDest = $TargetDrive + clamwin\bin
+$BinDest = $TargetDrive + "clamwin\bin"
 $BinFiles | foreach {cp -Path (b$bin_source + $_) -Destination $bin_dest}
  
 #Copy the config file - TODO - get the config file from the site
@@ -52,8 +52,8 @@ $ClamDirs = @("clamwin\log", "clamwin\db", "clamwin\quarantine")
 $ClamDirs | Foreach {mkdir ($TargetDrive) + $_}
 
 #Move databases
-cp -Path ($DatabaseDir + main.cvd) -Destination ($TargetDrive + clamwin\db)
-cp -Path ($DatabaseDir + daily.cvd) -Destination ($TargetDrive + clamwin\db)
+cp -Path ($DatabaseDir + "main.cvd") -Destination ($TargetDrive + "clamwin\db")
+cp -Path ($DatabaseDir + "daily.cvd") -Destination ($TargetDrive + "clamwin\db")
 
 #Tell user we're done
 Write-Output "Drive complete - Why not try it?"
