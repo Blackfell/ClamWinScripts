@@ -35,7 +35,7 @@ do {
 } until ($response -like 'y')
 
 #Copy the main bulk of files to the USB
-cp -Recurse -Path c:\program files\clamwin\* -Destination $TargetDrive
+cp -Recurse -Path "c:\program files\clamwin\*" -Destination $TargetDrive
 #TODO except unins000.exe abnd unins000.dat - doesn't seem to create any issues
 
 #Copy all binary files to the bin directory
