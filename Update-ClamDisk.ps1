@@ -11,45 +11,42 @@
 #####################################################################
 
 param (
-    [Parameter(Mandatory=$true)][string]$TargetDrive = $( Read-Host "Input target drive LETTER only please:" ),
+    [string]$TargetDrive = $(gwmi win32_volume -f 'label=''CLAMWIN''' | select -expandproperty Caption),
     [string]$ConfigFilePath = "C:\Program Files\clamwin",
     [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db"
 )
 
-#Get drive letter
-
-$TargetDrive = gwmi win32_volume -f 'label=''CLAM*'''
 
 #Offer user input to agree or override drive selection
-$msg = "The drive path (including trailing ':\') is: " + $TargetDrive + " Is this correct? [y/n]"
+$msg = "Your media is at: " + $TargetDrive + " Is this correct? [y/n]"
 
 do {
     $response = Read-Host -Prompt $msg
-    if ($response -like 'y') {
-        $TargetDrive = Read-Host "Input target drive, including trailig ':\' please:"
+    if ($response -like 'n') {
+        $TargetDrive = Read-Host "Input target drive"
     }
 
-} until ($response -like 'n')
+} until ($response -like 'y')
 
 #Move databases - TODO ensure replace happends
-cp -Path ($DatabaseDir + main.cvd) -Destination ($TargetDrive + clamwin\db)
-cp -Path ($DatabaseDir + daily.cvd) -Destination ($TargetDrive + clamwin\db)
+cp -Path ($DatabaseDir + "\main.cld") -Destination ($TargetDrive + "clamwin\db")
+cp -Path ($DatabaseDir + "\daily.cvd") -Destination ($TargetDrive + "clamwin\db")
 
 #Tell the user we're done!
 Write-Output "Drive complete - Why not try it?"
 Write-Output ""
 Write-Output "EnJoY yOuR cLaM"
 Write-Output "
-        .-'; ! ;'-.
-      .'!  : | :  !`.
-     /\  ! : ! : !  /\
-    /\ |  ! :|: !  | /\
-   (  \ \ ; :!: ; / /  )
-  ( `. \ | !:|:! | / .' )
-  (`. \ \ \!:|:!/ / / .')
-   \ `.`.\ |!|! |/,'.' /
-    `._`.\\\!!!// .'_.'
-       `.`.\\|//.'.'
-        |`._`n'_.'| 
-        '----^----'
+          .-'; ! ;'-.
+        .'!  : | :  !'.
+       /\  ! : ! : !  /\
+      /\ |  ! :|: !  | /\
+     (  \ \ ; :!: ; / /  )
+    ( '. \ | !:|:! | / .' )
+    ('. \ \ \!:|:!/ / / .')
+     \ '.'.\ |!|! |/,'.' /
+      '._'.\\\!!!// .'_.'
+         '.'.\\|//.'.'
+          |'._\n'_.'|
+          '----^----'
 "

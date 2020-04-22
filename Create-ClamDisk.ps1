@@ -11,49 +11,73 @@
 #####################################################################
 
 #Setup parameters for target dive and Clamwin Files
+#[string]$ConfigFilePath = "${Env:ProgramFiles(x86)}\clamwin", TODO - put this in clamwin prog dir
+
 param (
-    [Parameter(Mandatory=$true)][string]$TargetDrive = (Read-Host "Input target drive LETTER only please" ),
-    [string]$ConfigFilePath = "{$ProgramFiles(x86}\clamwin",
+    [string]$DriveLetter = $(Read-Host "Input target drive letter"),
+    [string]$ConfigFilePath = ".\",
     [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db"
 )
 
 #Try and get drive path correct by ourselves
 
-IF ($TargetDrive.contains(":\")){}
+IF ($DriveLetter.contains(":\")){}
 Else{
-    $TargetDrive = $TargetDrive + ":\"
+    $DriveLetter = $DriveLetter + ":\"
     }
 
 #Now sanity check and offer user input to override
 
-$msg = "The drive path (including trailing ':\' is: " + $TargetDrive + " Is this correct? [y/n]"
+$msg = "Your media is at: " + $DriveLetter + " Is this correct? [y/n]"
 do {
     $response = Read-Host -Prompt $msg
     if ($response -like 'n') {
-        $TargetDrive = Read-Host "Input target drive, including trailing ':\' please"
+        $DriveLetter = Read-Host "Input target drive letter"
     }
 } until ($response -like 'y')
 
+#Now make sure user understands the consequences of proceeding
+$msg = "This will now wipe all data on disk " + $DriveLetter + " Continue? [y/n]"
+do {
+    $response = Read-Host -Prompt $msg
+    if ($response -like 'n') {
+        exit
+    }
+} until ($response -like 'y')
+
+#Format the Drive
+Format-Volume -DriveLetter $DriveLetter[0] -Filesystem exFAT -NewFileSystemLabel "CLAMWIN" | Out-Null
+
+
+#Make directories
+$ClamDirs = @("clamwin", "clamwin\log", "clamwin\db", "clamwin\quarantine")
+$ClamDirs | Foreach {mkdir -Force ($DriveLetter + $_) | Out-Null}
+
 #Copy the main bulk of files to the USB
-cp -Recurse -Path "{$ProgramFiles(x86}\clamwin\*" -Destination $TargetDrive
-#TODO except unins000.exe abnd unins000.dat - doesn't seem to create any issues
+cp -Recurse -Force -Path "${Env:ProgramFiles(x86)}\clamwin\*" -Destination $($DriveLetter + "clamwin\")
 
 #Copy all binary files to the bin directory
 $BinFiles = @("Microsoft.VC80.CRT.manifest", "msvcm80.dll", "msvcm80.dll", "msvcr80.dll")
-$BinSource = "{$ProgramFiles(x86}\clamwin\bin\Microsoft.VC80.CRT\\"
-$BinDest = $TargetDrive + "clamwin\bin"
-$BinFiles | foreach {cp -Path (b$bin_source + $_) -Destination $bin_dest}
+$BinSource = "${Env:ProgramFiles(x86)}\clamwin\bin\Microsoft.VC80.CRT\\"
+$BinDest = $DriveLetter + "clamwin\bin"
+$BinFiles | foreach {cp -Path ($BinSource + $_) -Destination $bin_dest}
 
 #Copy the config file - TODO - get the config file from the site
-cp -Path (ConfigFilePath + "ClamWin.conf") -Destination $bin_dest
+cp -Path ($ConfigFilePath + "ClamWin.conf") -Destination $BinDest
 
-#Make directories
-$ClamDirs = @("clamwin\log", "clamwin\db", "clamwin\quarantine")
-$ClamDirs | Foreach {mkdir ($TargetDrive) + $_}
 
 #Move databases
-cp -Path ($DatabaseDir + "main.cvd") -Destination ($TargetDrive + "clamwin\db")
-cp -Path ($DatabaseDir + "daily.cvd") -Destination ($TargetDrive + "clamwin\db")
+cp -Path ($DatabaseDir + "\main.cld") -Destination ($DriveLetter + "clamwin\db")
+cp -Path ($DatabaseDir + "\daily.cvd") -Destination ($DriveLetter + "clamwin\db")
+
+#Clean up and shortcuts
+@($($DriveLetter+ "clamwin\unins000.exe"), $($DriveLetter + "clamwin\unins000.dat")) | ForEach {rm $_}
+$Shell = New-Object -ComObject ("WScript.Shell")
+$ShortCut = $Shell.CreateShortcut($DriveLetter + "clamwin\ClamWin.lnk")
+$ShortCut.TargetPath="$BinDest\ClamWin.exe"
+#$ShortCut.IconLocation = "yourexecutable.exe, 0";
+#$ShortCut.Description = "Your Custom Shortcut Description";
+$ShortCut.Save()
 
 #Tell user we're done
 Write-Output "Drive complete - Why not try it?"
@@ -61,15 +85,15 @@ Write-Output ""
 Write-Output "EnJoY yOuR cLaM"
 Write-Output "
         .-'; ! ;'-.
-      .'!  : | :  !`.
+      .'!  : | :  !'.
      /\  ! : ! : !  /\
     /\ |  ! :|: !  | /\
    (  \ \ ; :!: ; / /  )
-  ( `. \ | !:|:! | / .' )
-  (`. \ \ \!:|:!/ / / .')
-   \ `.`.\ |!|! |/,'.' /
-    `._`.\\\!!!// .'_.'
-       `.`.\\|//.'.'
-        |`._`n'_.'|
+  ( '. \ | !:|:! | / .' )
+  ('. \ \ \!:|:!/ / / .')
+   \ '.'.\ |!|! |/,'.' /
+    '._'.\\\!!!// .'_.'
+       '.'.\\|//.'.'
+        |'._\n'_.'|
         '----^----'
 "
