@@ -72,10 +72,10 @@ $ClamDirs | Foreach {mkdir -Force ($DriveLetter + $_) | Out-Null}
 cp -Recurse -Force -Path "${Env:ProgramFiles(x86)}\clamwin\*" -Destination $($DriveLetter + "clamwin\")
 
 #Copy all binary files to the bin directory
-#$BinFiles = @("Microsoft.VC80.CRT.manifest", "msvcm80.dll", "msvcm80.dll", "msvcr80.dll")
-#$BinSource = "${Env:ProgramFiles(x86)}\clamwin\bin\Microsoft.VC80.CRT\\"
-#$BinDest = $DriveLetter + "clamwin\bin"
-#$BinFiles | foreach {cp -Path ($BinSource + $_) -Destination $BinDest}
+$BinFiles = @("Microsoft.VC80.CRT.manifest", "msvcm80.dll", "msvcm80.dll", "msvcr80.dll")
+$BinSource = "${Env:ProgramFiles(x86)}\clamwin\bin\Microsoft.VC80.CRT\\"
+$BinDest = $DriveLetter + "clamwin\bin"
+$BinFiles | foreach {cp -Path ($BinSource + $_) -Destination $BinDest}
 
 #Copy the config file
 cp -Path ($ConfigPath + "ClamWin.conf") -Destination $BinDest
