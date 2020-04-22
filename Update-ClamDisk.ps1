@@ -45,8 +45,16 @@ ELSE
     } until ($response -like 'y')
 }
 
+#Format drive letter
+IF ($DriveLetter.contains(":\")){}
+Else{
+    $DriveLetter = $DriveLetter + ":\"
+    }
+
+
 #Move databases
-cp -Force -Path ($DatabaseDir + "\*") -Destination $($DriveLetter + "clamwin\db")
+#cp -Force -Path ($DatabaseDir + "\*") -Destination $($DriveLetter + "clamwin\db")
+cp -Path ($DatabaseDir + "\*") -Destination ($DriveLetter + "clamwin\db")
 
 #Tell the user we're done!
 Write-Output "Drive complete - Why not try it?"
