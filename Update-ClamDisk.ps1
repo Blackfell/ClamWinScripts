@@ -27,7 +27,7 @@ param (
 
 )
 
-IF(Force)
+IF($Force)
 {
   #No user input to get drive selection
 }
