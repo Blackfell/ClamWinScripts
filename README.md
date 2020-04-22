@@ -19,7 +19,7 @@ Plug your target drive into your machine, ensuring that Clamwin is installed in 
 PS C:\ClamWinScripts\ > Create-ClamDisk.ps1
 ```
 
-The script will search for your removable drive and prompt you to confirm or alter the target drive letter; once a drive is selected, the script will create the required fild structure on the drive and copy the required files to the destination. This will delete all data on the drive.
+The script will prompt you to confirm or enter the target drive letter; once a drive is selected, the script will create the required fild structure on the drive and copy the required files to the destination. This will delete all data on the drive.
 
 Alternatively you can specify arguments as desired:
 

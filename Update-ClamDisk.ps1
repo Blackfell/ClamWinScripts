@@ -11,7 +11,16 @@
 #####################################################################
 
 param (
-    [string]$TargetDrive = $(gwmi win32_volume -f 'label=''CLAMWIN''' | select -expandproperty Caption),
+    [string]$TargetDrive = $(
+                              IF(gwmi win32_volume -f 'label=''CLAMWIN''')
+                              {
+                                gwmi win32_volume -f 'label=''CLAMWIN''' | select -expandproperty Caption
+                              }
+                              ELSE
+                              {
+                                  Read-Host "Drive not detected. Enter drive letter"
+                              }
+                            ),
     [string]$ConfigFilePath = "C:\Program Files\clamwin",
     [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db"
 )
@@ -28,9 +37,8 @@ do {
 
 } until ($response -like 'y')
 
-#Move databases - TODO ensure replace happends
-cp -Path ($DatabaseDir + "\main.cld") -Destination ($TargetDrive + "clamwin\db")
-cp -Path ($DatabaseDir + "\daily.cvd") -Destination ($TargetDrive + "clamwin\db")
+#Move databases
+cp -Force -Path ($DatabaseDir + "\*") -Destination ($TargetDrive + "clamwin\db")
 
 #Tell the user we're done!
 Write-Output "Drive complete - Why not try it?"

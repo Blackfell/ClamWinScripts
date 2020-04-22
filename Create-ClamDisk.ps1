@@ -14,13 +14,21 @@
 #[string]$ConfigFilePath = "${Env:ProgramFiles(x86)}\clamwin", TODO - put this in clamwin prog dir
 
 param (
-    [string]$DriveLetter = $(Read-Host "Input target drive letter"),
+    [string]$DriveLetter = $(
+                              IF(get-volume | where drivetype -eq "removable")
+                              {
+                                (get-volume | where drivetype -eq "removable" | select -expandproperty DriveLetter)[0]
+                              }
+                              ELSE
+                              {
+                                Read-Host "No drive detected, enter drive letter"
+                              }
+                            ),
     [string]$ConfigFilePath = ".\",
     [string]$DatabaseDir = "C:\Documents and Settings\All Users\.clamwin\db"
 )
 
-#Try and get drive path correct by ourselves
-
+#Format drive letter
 IF ($DriveLetter.contains(":\")){}
 Else{
     $DriveLetter = $DriveLetter + ":\"
@@ -62,13 +70,12 @@ $BinSource = "${Env:ProgramFiles(x86)}\clamwin\bin\Microsoft.VC80.CRT\\"
 $BinDest = $DriveLetter + "clamwin\bin"
 $BinFiles | foreach {cp -Path ($BinSource + $_) -Destination $bin_dest}
 
-#Copy the config file - TODO - get the config file from the site
+#Copy the config file
 cp -Path ($ConfigFilePath + "ClamWin.conf") -Destination $BinDest
 
 
 #Move databases
-cp -Path ($DatabaseDir + "\main.cld") -Destination ($DriveLetter + "clamwin\db")
-cp -Path ($DatabaseDir + "\daily.cvd") -Destination ($DriveLetter + "clamwin\db")
+cp -Path ($DatabaseDir + "\*") -Destination ($DriveLetter + "clamwin\db")
 
 #Clean up and shortcuts
 @($($DriveLetter+ "clamwin\unins000.exe"), $($DriveLetter + "clamwin\unins000.dat")) | ForEach {rm $_}
